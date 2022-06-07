@@ -35,15 +35,12 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
   const addProduct = async (productId: number) => {
     try {
       var myProductIndex = cart.findIndex((element) => element.id == productId);
-      if(cart[myProductIndex].amount > 0) {
-        
-        cart[myProductIndex] = {
-          id:  cart[myProductIndex].id,
-          title:  cart[myProductIndex].title,
-          price:  cart[myProductIndex].price,
-          image:  cart[myProductIndex].image,
-          amount:  cart[myProductIndex].amount + 1,
-        }        
+      const productStock = (await api.get(`stock/${productId}`)).data
+      console.log(productStock);
+
+      if(productStock.amount > 0 ) {
+      
+        cart[myProductIndex].amount += 1,
         
         setCart([...cart]);  
 
