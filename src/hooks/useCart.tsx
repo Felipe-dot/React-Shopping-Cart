@@ -34,18 +34,31 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const addProduct = async (productId: number) => {
     try {
-      var myProductIndex = cart.findIndex((element) => element.id == productId);
+      var myProductIndex = cart.findIndex((element) => element.id === productId);
       const productStock = (await api.get(`stock/${productId}`)).data
-      console.log(productStock);
 
-      if(productStock.amount > 0 ) {
+      if(productStock.amount > 0 && myProductIndex !== -1) {
       
-        cart[myProductIndex].amount += 1,
-        
+        cart[myProductIndex].amount += 1;
+    
         setCart([...cart]);  
 
         localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
-      } else {
+      } else if(productStock.amount > 0 ) {
+        var myProduct = (await api.get(`products/${productId}`)).data;
+        cart.concat({
+          id: myProduct.id,
+          amount: myProduct.amount,
+          image: myProduct.image,
+          price: myProduct.price,
+          title: myProduct.title,
+        });
+
+        setCart([...cart]);  
+
+        localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
+      }
+      else{
         toast.error('Quantidade solicitada fora de estoque');
       }
     } catch {
@@ -55,7 +68,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
-      var myProductIndex = cart.findIndex((element) => element.id == productId);
+      var myProductIndex = cart.findIndex((element) => element.id === productId);
       cart.splice(myProductIndex,1);
       setCart([...cart]);
       localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
@@ -69,7 +82,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     amount,
   }: UpdateProductAmount) => {
     try {
-      var myProductIndex = cart.findIndex((element) => element.id == productId);
+      var myProductIndex = cart.findIndex((element) => element.id === productId);
       cart[myProductIndex].amount = amount;
       setCart([...cart]);
       localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
