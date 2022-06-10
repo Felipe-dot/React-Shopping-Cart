@@ -26,25 +26,24 @@ const Home = (): JSX.Element => {
   const { addProduct, cart } = useCart();
 
   const cartItemsAmount = cart.reduce((sumAmount, product) => {
-    return {};     
+    return {};
   }, {} as CartItemsAmount)
 
   useEffect(() => {
     async function loadProducts() {
         const productData = (await api.get('products')).data;
-        var productFormat : ProductFormatted[] = [];
 
-        productData.forEach((element : Product) => {
-          productFormat.concat({
-            id: element.id,
-            title: element.title,
-            price: element.price,
-            image: element.image,
-            priceFormatted: formatPrice(element.price),
+        setProducts(
+          productData.map((product: Product) => {
+            return {
+              id: product.id,
+              title: product.title,
+              price: product.price,
+              priceFormatted: formatPrice(product.price),
+              image: product.image,
+            }
           })
-        })
-
-        setProducts([...productFormat]);
+      );
     }
 
     loadProducts();
@@ -57,7 +56,7 @@ const Home = (): JSX.Element => {
   return (
     <ProductList>
       {products.map(product => (
-        <li>
+        <li key={product.id}>
         <img src={product.image} alt="Tênis de Caminhada Leve Confortável" />
         <strong>{product.title}</strong>
         <span>{product.priceFormatted}</span>
@@ -68,7 +67,7 @@ const Home = (): JSX.Element => {
         >
           <div data-testid="cart-product-quantity">
             <MdAddShoppingCart size={16} color="#FFF" />
-            {cartItemsAmount[product.id] || 0} 2
+            {cartItemsAmount[product.id] || 0} 
           </div>
 
             <span>ADICIONAR AO CARRINHO</span>
